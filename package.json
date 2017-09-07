@@ -1,0 +1,10 @@
+{
+  "name": "buzy",
+  "version": "0.1.0",
+  "description": "Async queue manager for node and browser",
+  "main": "index.js",
+  "repository": "git@github.com:subbu963/buzy.git",
+  "author": "subramanyam963@gmail.com",
+  "license": "MIT",
+  "private": false
+}
