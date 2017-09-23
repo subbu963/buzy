@@ -2,12 +2,12 @@
  * Created by adithya.s on 23/09/17.
  */
 const Buzy = require('./Buzy');
-const b = new Buzy(function (message) {
+const b = new Buzy([function (message) {
     console.log('in b', message);
-});
-const c = new Buzy(function (message) {
+}]);
+const c = new Buzy([function (message) {
     console.log('in c', message, c.isBusy())
-}, b);
+}], [b]);
 
 b.addPromise(new Promise(function (resolve, reject) {
     setTimeout(function () {

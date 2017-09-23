@@ -35,7 +35,9 @@ class Buzy {
         return state.busy;
     }
     addPromises(promises) {
-        promises = utils.isArray(promises) ? promises : [promises];
+        if(!utils.isArray(promises)) {
+            throw new Error(`array expected, ${utils.type(promises)} provided`);
+        }
         promises.forEach(this.addPromise.bind(this));
     }
     addPromise(promise) {
@@ -87,7 +89,9 @@ class Buzy {
         if(!subscribers) {
             return;
         }
-        subscribers = utils.isArray(subscribers) ? subscribers : [subscribers];
+        if(!utils.isArray(subscribers)) {
+            throw new Error(`array expected, ${utils.type(subscribers)} provided`);
+        }
         subscribers.forEach(this.addSubscriber.bind(this));
     }
     addBuzy(buzy) {
@@ -121,7 +125,9 @@ class Buzy {
         if(!buzies) {
             return;
         }
-        buzies = utils.isArray(buzies) ? buzies : [buzies];
+        if(!utils.isArray(buzies)) {
+            throw new Error(`array expected, ${utils.type(buzies)} provided`);
+        }
         buzies.forEach(this.addBuzy.bind(this));
     }
 }
