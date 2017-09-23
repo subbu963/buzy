@@ -14,14 +14,21 @@ function asyncEvokeFunctions(arr, ...args) {
         utils.defer(fn, ...args);
     });
 }
+function isBuzy(buzy) {
+    return utils.type(buzy) === 'Buzy';
+}
+
 module.exports = class Buzy {
-    constructor(subscribers) {
+    constructor(subscribers, buzies) {
         stateMap.set(this, {
             busy: false,
             activePromises: [],
-            subscribers: []
+            subscribers: [],
+            buzies: []
         });
+        const state = stateMap.get(this);
         this.addSubscribers(subscribers);
+        this.addBuzies(buzies);
     }
     isBusy() {
         const state = stateMap.get(this);
@@ -75,7 +82,39 @@ module.exports = class Buzy {
         state.subscribers.push(subscriber);
     }
     addSubscribers(subscribers) {
+        if(!subscribers) {
+            return;
+        }
         subscribers = utils.isArray(subscribers) ? subscribers : [subscribers];
         subscribers.forEach(this.addSubscriber.bind(this));
+    }
+    addBuzy(buzy) {
+        if(!isBuzy(buzy)) {
+            throw new Error(`instance of Buzy expected, ${utils.type(buzy)} provided`);
+        }
+        const state = stateMap.get(this);
+        state.buzies.push(buzy);
+        state.busy = state.busy || buzy.isBusy();
+        asyncEvokeFunctions(state.subscribers, {
+            code: MESSAGE_CODE_MAP.STATE,
+            busy: state.busy
+        });
+        buzy.addSubscriber(function(message) {
+            if(MESSAGE_CODE_MAP.STATE !== message.code) {
+                return;
+            }
+            state.busy = !!Math.max(...state.buzies.map(_buzy => _buzy.isBusy()));
+            asyncEvokeFunctions(state.subscribers, {
+                code: MESSAGE_CODE_MAP.STATE,
+                busy: state.busy
+            });
+        });
+    }
+    addBuzies(buzies) {
+        if(!buzies) {
+            return;
+        }
+        buzies = utils.isArray(buzies) ? buzies : [buzies];
+        buzies.forEach(this.addBuzy.bind(this));
     }
 };

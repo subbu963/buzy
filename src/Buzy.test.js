@@ -3,8 +3,11 @@
  */
 const Buzy = require('./Buzy');
 const b = new Buzy(function (message) {
-    console.log(message, b.isBusy())
+    console.log('in b', message);
 });
+const c = new Buzy(function (message) {
+    console.log('in c', message, c.isBusy())
+}, b);
 
 b.addPromise(new Promise(function (resolve, reject) {
     setTimeout(function () {

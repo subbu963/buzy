@@ -3,7 +3,11 @@
  */
 function noop() {}
 function type(value) {
-    return Object.prototype.toString.call(value).match(/\w+/g)[1].toLowerCase();
+    const type = Object.prototype.toString.call(value).match(/\w+/g)[1];
+    if(type === 'Object') {
+        return value && value.constructor ? value.constructor.name : type;
+    }
+    return type;
 }
 function defer(fn, args) {
     if(!isFunction(fn)) {
@@ -34,13 +38,13 @@ function combinePromises(promises) {
     }))
 }
 function isFunction(fn) {
-    return type(fn) === 'function';
+    return type(fn) === 'Function';
 }
 function isArray(ar) {
-    return type(ar) === 'array';
+    return type(ar) === 'Array';
 }
 function isPromise(promise) {
-    return type(promise) === 'promise';
+    return type(promise) === 'Promise';
 }
 module.exports = {
     defer,
