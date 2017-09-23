@@ -52,17 +52,6 @@ class Buzy {
             });
         }
         state.busy = true;
-        const localCb = res => {
-            const idx = state.activePromises.findIndex(item => item === promise);
-            state.activePromises.splice(idx, 1);
-            if(!state.activePromises.length) {
-                state.busy = false;
-                asyncEvokeFunctions(state.subscribers, {
-                    code: MESSAGE_CODE_MAP.STATE,
-                    busy: state.busy
-                });
-            }
-        };
         promise.then(res => {
             asyncEvokeFunctions(state.subscribers, {
                 code: MESSAGE_CODE_MAP.RESOLVE,
@@ -75,7 +64,17 @@ class Buzy {
                 error: error,
                 promise: promise
             });
-        }).then(localCb);
+        }).then(res => {
+            const idx = state.activePromises.findIndex(item => item === promise);
+            state.activePromises.splice(idx, 1);
+            if(!state.activePromises.length) {
+                state.busy = false;
+                asyncEvokeFunctions(state.subscribers, {
+                    code: MESSAGE_CODE_MAP.STATE,
+                    busy: state.busy
+                });
+            }
+        });
     }
     addSubscriber(subscriber) {
         if(!utils.isFunction(subscriber)) {

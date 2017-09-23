@@ -4,7 +4,10 @@ Promise based async queue manager for node and browser.
 Buzy is a blackbox into which you push promises and at each point in time you can know if any of the promises are still in pending state(busy state). Optionally you can subscribe for the event bus which will let you know when there is change in the blackbox state
 
 Its particularly useful where you want to know if your system is busy with async activities like ajax calls etc. You can push promises in to the queue and buzy will do the job of letting you know when the state of the system changes.
-
+Use cases can be:
+1) Show loaders on ajax calls
+2) Check if any of your tasks are pending before closing the browser
+And similar others
 
 ## Installation
 ```bash
@@ -45,7 +48,7 @@ buzy.addBuzy(buzy) //single buzy
 buzy.addBuzies(buzies)//array of buzies
 ```
 
-To check is a buzy is busy or not:
+To check if buzy is busy or not:
 ```javascript
 buzy.isBusy() //true or false
 ```
@@ -107,4 +110,5 @@ buzy2.addPromise(fetch('http://someurl'));
 Check [Buzy.test.js](src/Buzy.test.js) for more exmaples
 ## To do
 1) Cancellation of requests
-2) You tell me!
+2) Removal of subscribers/buzies
+3) You tell me!
