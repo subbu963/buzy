@@ -17,10 +17,6 @@ module.exports = class Buzy {
             notifier: notifier || utils.noop
         });
     }
-    notify(message) {
-        const state = stateMap.get(this);
-        utils.defer(state.notifier, message);
-    }
     isBusy() {
         const state = stateMap.get(this);
         return state.busy;
@@ -32,7 +28,7 @@ module.exports = class Buzy {
         const state = stateMap.get(this);
         state.activePromises.push(promise);
         state.busy = true;
-        this.notify({
+        utils.defer(state.notifier, {
             code: MESSAGE_CODE_MAP.STATE,
             busy: state.busy
         });
@@ -41,20 +37,20 @@ module.exports = class Buzy {
             state.activePromises.splice(idx, 1);
             if(!state.activePromises.length) {
                 state.busy = false;
-                this.notify({
+                utils.defer(state.notifier, {
                     code: MESSAGE_CODE_MAP.STATE,
                     busy: state.busy
                 });
             }
         };
         promise.then(res => {
-            this.notify({
+            utils.defer(state.notifier, {
                 code: MESSAGE_CODE_MAP.RESOLVE,
                 value: res,
                 promise: promise
             });
         }, error => {
-            this.notify({
+            utils.defer(state.notifier, {
                 code: MESSAGE_CODE_MAP.REJECT,
                 error: error,
                 promise: promise
