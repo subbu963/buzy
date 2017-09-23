@@ -15,10 +15,10 @@ function asyncEvokeFunctions(arr, ...args) {
     });
 }
 function isBuzy(buzy) {
-    return utils.type(buzy) === 'Buzy';
+    return buzy instanceof Buzy;
 }
 
-module.exports = class Buzy {
+class Buzy {
     constructor(subscribers, buzies) {
         stateMap.set(this, {
             busy: false,
@@ -44,11 +44,13 @@ module.exports = class Buzy {
         }
         const state = stateMap.get(this);
         state.activePromises.push(promise);
+        if(!state.busy) {
+            asyncEvokeFunctions(state.subscribers, {
+                code: MESSAGE_CODE_MAP.STATE,
+                busy: true
+            });
+        }
         state.busy = true;
-        asyncEvokeFunctions(state.subscribers, {
-            code: MESSAGE_CODE_MAP.STATE,
-            busy: state.busy
-        });
         const localCb = res => {
             const idx = state.activePromises.findIndex(item => item === promise);
             state.activePromises.splice(idx, 1);
@@ -94,20 +96,25 @@ module.exports = class Buzy {
         }
         const state = stateMap.get(this);
         state.buzies.push(buzy);
-        state.busy = state.busy || buzy.isBusy();
-        asyncEvokeFunctions(state.subscribers, {
-            code: MESSAGE_CODE_MAP.STATE,
-            busy: state.busy
-        });
-        buzy.addSubscriber(function(message) {
-            if(MESSAGE_CODE_MAP.STATE !== message.code) {
-                return;
-            }
-            state.busy = !!Math.max(...state.buzies.map(_buzy => _buzy.isBusy()));
+        if(buzy.isBusy() && !state.busy) {
             asyncEvokeFunctions(state.subscribers, {
                 code: MESSAGE_CODE_MAP.STATE,
                 busy: state.busy
             });
+        }
+        state.busy = state.busy || buzy.isBusy();
+        buzy.addSubscriber(function(message) {
+            if(MESSAGE_CODE_MAP.STATE !== message.code) {
+                return;
+            }
+            const isBusy = !!Math.max(...state.buzies.map(_buzy => _buzy.isBusy()));
+            if(state.busy !== isBusy) {
+                asyncEvokeFunctions(state.subscribers, {
+                    code: MESSAGE_CODE_MAP.STATE,
+                    busy: isBusy
+                });
+            }
+            state.busy = isBusy;
         });
     }
     addBuzies(buzies) {
@@ -117,4 +124,5 @@ module.exports = class Buzy {
         buzies = utils.isArray(buzies) ? buzies : [buzies];
         buzies.forEach(this.addBuzy.bind(this));
     }
-};
+}
+module.exports = Buzy;
