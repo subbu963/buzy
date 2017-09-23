@@ -59,3 +59,7 @@ To check is a buzy is busy or not:
 ```javascript
 buzy.isBusy() //true or false
 ```
+
+## To do
+1) Cancellation of requests
+2) You tell me!
