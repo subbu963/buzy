@@ -1,5 +1,8 @@
 # buzy
-Async queue manager for node and browser
+Async queue manager for node and browser.
+
+Its particularly useful where you want to know if your system is busy with async activities like ajax calls etc. You can push promises in to the queue and buzy will do the job of letting you know when the state of the system changes.
+
 
 ## Installation
 ```bash
