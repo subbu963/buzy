@@ -1,5 +1,7 @@
 # buzy
-Async queue manager for node and browser.
+Promise based async queue manager for node and browser.
+
+Buzy is a blackbox into which you push promises and at each point in time you can know if any of the promises are still in pending state(busy state). Optionally you can subscribe for the event bus which will let you know when there is change in the blackbox state
 
 Its particularly useful where you want to know if your system is busy with async activities like ajax calls etc. You can push promises in to the queue and buzy will do the job of letting you know when the state of the system changes.
 
@@ -7,21 +9,6 @@ Its particularly useful where you want to know if your system is busy with async
 ## Installation
 ```bash
 $ npm install buzy
-```
-## Usage
-```javascript
-import Buzy from 'buzy';
-
-const buzy1 = new Buzy;
-const buzy2 = new Buzy([function(message) {
-  console.log(message);
-}], [buzy1]);
-
-buzy1.addPromise(new Promise(function(resolve, reject) {
-  setTimeout(function() {
-    resolve('done');
-  }, 1000);
-}))
 ```
 
 ## Syntax
@@ -63,6 +50,61 @@ To check is a buzy is busy or not:
 buzy.isBusy() //true or false
 ```
 
+## Examples
+```javascript
+import Buzy from 'buzy';
+
+const buzy1 = new Buzy([function(message) {
+  console.log(message);
+   /*
+      Prints the following:
+      {
+          code: 0,
+          busy: true
+      }
+      And after 1000 milliseconds
+      {
+          code: 1,
+          promise: Promise{'done'},
+          value: 'done'
+      }
+      And then
+      {
+          code: 0,
+          busy: false
+      }
+    */
+}]);
+const buzy2 = new Buzy([function(message) {
+  console.log(message);
+  /*
+    Prints the following:
+    {
+        code: 0,
+        busy: true
+    }
+    And after fetch is complete
+    {
+        code: 1 or 2 based on fetch result,
+        promise: Promise{res from fetch},
+        value: value or error: error based fetch result
+    }
+    And then after buzy1 is done with all the tasks
+    {
+        code: 0,
+        busy: false
+    }
+  */
+}], [buzy1]);
+
+buzy1.addPromise(new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    resolve('done');
+  }, 1000);
+}))
+buzy2.addPromise(fetch('http://someurl'));
+```
+Check [Buzy.test.js](src/Buzy.test.js) for more exmaples
 ## To do
 1) Cancellation of requests
 2) You tell me!

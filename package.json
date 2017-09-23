@@ -1,6 +1,6 @@
 {
   "name": "buzy",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Async queue manager for node and browser",
   "main": "src/index.js",
   "repository": "git@github.com:subbu963/buzy.git",

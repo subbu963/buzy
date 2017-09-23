@@ -26,7 +26,6 @@ class Buzy {
             subscribers: [],
             buzies: []
         });
-        const state = stateMap.get(this);
         this.addSubscribers(subscribers);
         this.addBuzies(buzies);
     }
