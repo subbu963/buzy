@@ -7,7 +7,7 @@ Its particularly useful where you want to know if your system is busy with async
 Use cases can be:
 1) Show loaders on ajax calls
 2) Check if any of your tasks are pending before closing the browser
-And similar others
+and similar others
 
 ## Installation
 ```bash

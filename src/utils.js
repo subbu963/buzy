@@ -44,7 +44,7 @@ function isArray(ar) {
     return type(ar) === 'Array';
 }
 function isPromise(promise) {
-    return type(promise) === 'Promise';
+    return promise && isFunction(promise.then);
 }
 module.exports = {
     defer,

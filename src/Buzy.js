@@ -22,7 +22,7 @@ class Buzy {
     constructor(subscribers, buzies) {
         stateMap.set(this, {
             busy: false,
-            activePromises: [],
+            pendingPromises: [],
             subscribers: [],
             buzies: []
         });
@@ -44,7 +44,7 @@ class Buzy {
             throw new Error(`promise expected, ${utils.type(promise)} provided`);
         }
         const state = stateMap.get(this);
-        state.activePromises.push(promise);
+        state.pendingPromises.push(promise);
         if(!state.busy) {
             asyncEvokeFunctions(state.subscribers, {
                 code: MESSAGE_CODE_MAP.STATE,
@@ -65,9 +65,9 @@ class Buzy {
                 promise: promise
             });
         }).then(res => {
-            const idx = state.activePromises.findIndex(item => item === promise);
-            state.activePromises.splice(idx, 1);
-            if(!state.activePromises.length) {
+            const idx = state.pendingPromises.findIndex(item => item === promise);
+            state.pendingPromises.splice(idx, 1);
+            if(!state.pendingPromises.length) {
                 state.busy = false;
                 asyncEvokeFunctions(state.subscribers, {
                     code: MESSAGE_CODE_MAP.STATE,
